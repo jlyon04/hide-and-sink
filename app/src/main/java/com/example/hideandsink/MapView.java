@@ -17,7 +17,7 @@ public class MapView extends View {
   }
 
   private Map map;
-  private int mapSize = 10;
+  private int mapSize = 8;
   private int mapBackgroundColor = Color.BLUE;
   private int mapLineColor = Color.WHITE;
 

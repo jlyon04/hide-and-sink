@@ -9,22 +9,47 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="0.4"
         android:orientation="vertical"
-        android:gravity="center">
+        android:gravity="center_horizontal">
 
-
-
-        <com.example.hideandsink.MapView
-            android:id="@+id/mapView"
-            android:layout_width="350dp"
-            android:layout_height="350dp"/>
-
-        <TextView
+        <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="40dp"
-            android:text="Map View"/>
+            android:layout_height="wrap_content">
+            <com.example.hideandsink.MapView
+                android:id="@+id/mapView"
+                android:layout_width="400dp"
+                android:layout_height="400dp"
+                android:layout_marginTop="50dp"/>
 
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="400dp"
+            android:layout_marginTop="5dp"
+            android:orientation="vertical"
+            android:gravity="center_horizontal">
+
+            <Button
+                android:id="@+id/moveSubBtn"
+                android:layout_width="150dp"
+                android:layout_height="50dp"
+                android:text="Move Sub"
+                android:visibility="invisible"/>
+            <Button
+                android:id="@+id/placeSubBtn"
+                android:layout_width="150dp"
+                android:layout_height="50dp"
+                android:text="Place Ship"
+                android:visibility="visible"/>
+            <Button
+                android:id="@+id/confrimSubBtn"
+                android:layout_width="150dp"
+                android:layout_height="50dp"
+                android:text="Confirm Placement"
+                android:visibility="invisible"/>
+
+        </LinearLayout>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

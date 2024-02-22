@@ -19,7 +19,7 @@ public class MainActivity extends AppCompatActivity {
       @Override
       public void onClick(View view) {
         //Start New Activity
-        Intent intent = new Intent(view.getContext(), GameActivity.class);
+        Intent intent = new Intent(view.getContext(), PlacementActivity.class);
         view.getContext().startActivity(intent);
       }
     });

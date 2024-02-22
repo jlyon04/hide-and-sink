@@ -16,6 +16,17 @@ public class Cell {
   boolean isScopeMiss=false;
   boolean isShotHit=false;
   boolean isShotMiss=false;
-  boolean isShip=false;
+  boolean isSub=false;
+  boolean isPlace=false;
 
+  public void resetCell(){
+    this.isPlace=false;
+    this.isSub=false;
+    this.isSonarHit=false;
+    this.isSonarMiss=false;
+    this.isScopeHit=false;
+    this.isScopeMiss=false;
+    this.isShotHit=false;
+    this.isShotMiss=false;
+  }
 }

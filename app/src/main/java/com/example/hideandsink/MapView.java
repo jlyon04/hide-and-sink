@@ -19,6 +19,10 @@ public class MapView extends View {
     super(context, attrs);
   }
 
+  public void setMap(Map map){
+    this.map = map;
+  }
+
   private Map map;
   private int mapSize = 8;
   private int mapBackgroundColor = Color.parseColor("#00B7C3");
@@ -48,11 +52,7 @@ public class MapView extends View {
   protected void onDraw(Canvas canvas){
     super.onDraw(canvas);
     drawGrid(canvas);
-    if(placerMode){
-      drawShipPlacer(canvas, 1, 0);
-      drawShipPlacer(canvas, 1, 1);
-      drawShipPlacer(canvas, 1, 2);
-    }
+    drawCellOptions(canvas);
   }
   private void drawGrid(Canvas canvas) {
     float maxCoord = maxCoord();
@@ -64,14 +64,9 @@ public class MapView extends View {
       canvas.drawLine(0, xy, maxCoord, xy, mapLinePaint);
       canvas.drawLine(xy,0,xy, maxCoord, mapLinePaint);
     }
-
   }
 
   void drawShipPlacer(Canvas canvas, int x, int y){
-    Paint dotted_black = new Paint();
-    dotted_black.setStyle(Paint.Style.STROKE);
-    dotted_black.setColor(Color.BLACK);
-    dotted_black.setStrokeWidth(3);
     float viewSize = maxCoord();
     float tileSize = viewSize / 8;  //8 Is how many tiles there are
     float offSet = 8;
@@ -90,6 +85,26 @@ public class MapView extends View {
 
   private void drawShips(Canvas canvas){}
   private void drawShipHitCell(Canvas canvas){}
+
+  private void drawCellOptions(Canvas canvas){
+    for(int x = 0; x < mapSize; x++){
+      for(int y = 0; y < mapSize; y++){
+        // Placer
+        if(map.cellAt(x, y).isPlace){
+          drawShipPlacer(canvas, x, y);
+        }
+        // Sub Location
+        if(map.cellAt(x, y).isSub) {
+        }
+        // Scope Fail
+        // Scope Hit
+        // Fire Fail
+        // Fire Hit
+        // Sonar Fail
+        // Sonar Hit
+      }
+    }
+  }
 
   //locateCell(x,y)
   //public void addBoardTouchListener(BoardTouchListener listener) {

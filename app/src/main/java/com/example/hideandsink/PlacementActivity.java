@@ -2,9 +2,14 @@ package com.example.hideandsink;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class PlacementActivity extends AppCompatActivity {
 
@@ -12,6 +17,10 @@ public class PlacementActivity extends AppCompatActivity {
   private Map map;
   private boolean dir; //true = vertical
 
+  private String placeType;
+
+  private ArrayList<String> xyList= new ArrayList<String>();
+  Button confirmBtn, rotateBtn, backBtn;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -19,48 +28,144 @@ public class PlacementActivity extends AppCompatActivity {
     setContentView(R.layout.activity_placement);
 
     // Initialize Board and Placers
+    dir=true;
     map = new Map();
-    //map.placePlacer("sub", 0,0,true);
-    // Placer Mode for Drawing
-    // mapView.invalidate();
+
+    Intent mapdata = this.getIntent();
+    String mapString = mapdata.getStringExtra("map");
+    placeType = mapdata.getStringExtra("placeType");
 
     mapView = findViewById(R.id.placementMapView);
-    mapView.setOnTouchListener(mapTouch);
     mapView.setMap(map);
+    mapView.setOnTouchListener(mapTouch);
+
+    confirmBtn = findViewById(R.id.confirmSubBtn);
+    confirmBtn.setOnClickListener(confirmClick);
+    rotateBtn = findViewById(R.id.rotateSubBtn);
+    rotateBtn.setOnClickListener(rotateClick);
   }
   private View.OnTouchListener mapTouch = new View.OnTouchListener(){
     @Override
     public boolean onTouch(View view, MotionEvent motionEvent) {
       //Remove Old Placers
-      map.clearMap();
+      map.removeAllPlacers();
+      if (xyList != null){
+        xyList.clear();
+      }
       mapView.invalidate();
-      if (motionEvent.getAction() == MotionEvent.ACTION_DOWN){
+      if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
         int xy = mapView.locatePlace(motionEvent.getX(), motionEvent.getY());
-        int x = xy/100;
-        int y = xy%100;
-        //handle out of bounds
-        if (dir) {
-          if (y >= 6) {
-            y = 5;
+        int x = xy / 100;
+        int y = xy % 100;
+        // ---------- SUB PLACEMENT --------------
+        if (placeType.equals("subPlacement") || placeType.equals("subPlacementStart")) {
+          //handle out of bounds
+          if (dir) {
+            if (y >= 6) {
+              y = 5;
+            }
+            map.cellAt(x, y).isPlace = true;
+            map.cellAt(x, y + 1).isPlace = true;
+            map.cellAt(x, y + 2).isPlace = true;
+            xyList.add(String.valueOf(x) + "," + String.valueOf(y));
+            xyList.add((x) + "," + (y + 1));
+            xyList.add((x) + "," + (y + 2));
+          } else {
+            if (x >= 6) {
+              x = 5;
+            }
+            map.cellAt(x, y).isPlace = true;
+            map.cellAt(x + 1, y).isPlace = true;
+            map.cellAt(x + 2, y).isPlace = true;
+            xyList.add(String.valueOf(x) + "," + String.valueOf(y));
+            xyList.add((x + 1) + "," + y);
+            xyList.add((x + 2) + "," + y);
           }
-          map.cellAt(x,y).isPlace=true;
-          map.cellAt(x,y+1).isPlace=true;
-          map.cellAt(x,y+2).isPlace=true;
+          mapView.invalidate();
         }
-        else{
-         if (x >= 6) {
-           x=5;
-         }
-          map.cellAt(x,y).isPlace=true;
-          map.cellAt(x+1,y).isPlace=true;
-          map.cellAt(x+2,y).isPlace=true;
+        // -------------- SONAR PLACEMENT -------------
+        else if(placeType.equals("sonarPlacement")) {
+          //handle out of bounds
+          if(y>6)
+            y=6;
+          if (x>6)
+            x=6;
+          map.cellAt(x, y).isPlace = true;
+          map.cellAt(x, y + 1).isPlace = true;
+          map.cellAt(x+1, y).isPlace = true;
+          map.cellAt(x+1, y + 1).isPlace = true;
+          xyList.add(x + "," + y);
+          xyList.add((x) + "," + (y + 1));
+          xyList.add((x+1) + "," + (y));
+          xyList.add((x+1) + "," + (y + 1));
         }
-        //set ship x and y?
-        //invalidate?
-        mapView.invalidate();
+        // -------------- SCOPE PLACEMENT -------------
+        else if(placeType.equals("scopePlacement")) {
+          if (dir) {
+            //handle out of bounds
+            if (y > 6)
+              y = 6;
+            map.cellAt(x, y).isPlace = true;
+            map.cellAt(x, y + 1).isPlace = true;
+            xyList.add(x + "," + y);
+            xyList.add((x) + "," + (y + 1));
+          }
+          else{
+            if (x > 6)
+              x=6;
+            map.cellAt(x, y).isPlace = true;
+            map.cellAt(x+1, y).isPlace = true;
+            xyList.add(x + "," + y);
+            xyList.add((x+1) + "," + y);
+          }
+        }
+        // -------------- SHOT PLACEMENT -------------
+        else if(placeType.equals("shotPlacement")) {
+          map.cellAt(x, y).isPlace = true;
+          xyList.add(x + "," + y);
+        }
       }
       return false;
     }
   };
+
+
+  //Confirm Button
+  private View.OnClickListener confirmClick = new View.OnClickListener() {
+    @Override
+    public void onClick(View view) {
+      //Capture X,Y as STRINGS for all three placements
+      if (xyList.isEmpty()){
+        // FAIL - Alert User, Must have a selection
+        return;
+      }
+      // Return from Activity XY list
+      Intent retIntent = new Intent();
+      retIntent.putStringArrayListExtra("xyList", xyList);
+      setResult(RESULT_OK, retIntent);
+      finish();
+    }
+  };
+  // Rotate Button
+  private View.OnClickListener rotateClick = new View.OnClickListener() {
+    @Override
+    public void onClick(View view) {
+      xyList.clear();
+      map.removeAllPlacers();
+      if(dir)
+        dir=false;
+      else
+        dir=true;
+      mapView.invalidate();
+    }
+  };
+
+
+
+  // Continue to Main Game
+  public void startMainGame(View view){
+
+  }
+  // Game Manager Must Be Parceable/Serializable
 
 }

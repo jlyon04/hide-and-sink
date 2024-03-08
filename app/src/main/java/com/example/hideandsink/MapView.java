@@ -18,11 +18,6 @@ public class MapView extends View {
   public MapView(Context context, @Nullable AttributeSet attrs) {
     super(context, attrs);
   }
-
-  public void setMap(Map map){
-    this.map = map;
-  }
-
   private Map map;
   private int mapSize = 8;
   private int mapBackgroundColor = Color.parseColor("#00B7C3");
@@ -36,6 +31,9 @@ public class MapView extends View {
     mapPaint.setColor(mapBackgroundColor);
   }
 
+  public void setMap(Map map){
+    this.map = map;
+  }
   // TEST PUBLICS
   boolean placerMode=false;
 
@@ -87,6 +85,11 @@ public class MapView extends View {
   private void drawShipHitCell(Canvas canvas){}
 
   private void drawCellOptions(Canvas canvas){
+    if (map == null){
+      //TODO Debug Option
+      // Start of game there is no map, need to check on this
+      return;
+    }
     for(int x = 0; x < mapSize; x++){
       for(int y = 0; y < mapSize; y++){
         // Placer

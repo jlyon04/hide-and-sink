@@ -5,42 +5,36 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:gravity="center"
-        >
+        android:gravity="center_horizontal">
 
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hide And Sink"
-        app:layout_constraintBottom_toTopOf="@+id/newGameBtn"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <com.example.hideandsink.MapView
+                android:id="@+id/placementMapView"
+                android:layout_width="400dp"
+                android:layout_height="400dp"
+                android:layout_marginTop="50dp"/>
 
-        <Button
-            android:id="@+id/newGameBtn"
-            android:layout_width="200dp"
-            android:layout_height="50dp"
-            android:text="New Game"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            tools:layout_editor_absoluteY="246dp" />
+        </LinearLayout>
 
-        <Button
-            android:id="@+id/optionsBtn"
-            android:layout_width="200dp"
-            android:layout_height="50dp"
-            android:text="Options"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.502"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/newGameBtn"
-            app:layout_constraintVertical_bias="0.114" />
+
+        <LinearLayout
+            android:id="@+id/gameButtonLayout"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.5"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:orientation="vertical"
+            android:gravity="center_horizontal">
+
+        </LinearLayout>
     </LinearLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -44,6 +44,14 @@ public class Map {
     }
   }
 
+  void removeAllPlacers(){
+    for(int y=0;y<map.length;y++){
+      for(int x=0;x<map[0].length;x++){
+        cellAt(x,y).isPlace=false;
+      }
+    }
+  }
+
   //placeShip
   void placePlacer(String type, int x, int y, boolean dir){
     Cell startCell = cellAt(x,y);

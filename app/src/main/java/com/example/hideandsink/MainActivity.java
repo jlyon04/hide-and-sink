@@ -18,21 +18,22 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
-
   private GameManager game;
-
+  private Player activePlayer, player;
+  private ComputerPlayer opponent;
+  private MapView playerMapView;
   private Context ctx;
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
-
     ctx=this;
+
     // Check for Continue Game
     Intent intent = getIntent();
     if (intent==null){
       //new game
-      //??game = new GameManager();
+      game = new GameManager();
     }
 
     // User Place Subs
@@ -40,17 +41,27 @@ public class MainActivity extends AppCompatActivity {
     subPlaceIntent.putExtra("placeType", "subPlacementStart");
     placementActivityLauncher.launch(subPlaceIntent);
 
+
+    // Set up Computer Opponent + Map with Sub Placed Randomly
+    //opponent = new ComputerPlayer();
+    //opponent.setPlayerMap(new Map());
+    //opponent.placeSubRandomly();
+
+    // Set up User Board
+    //playerMapView = findViewById(R.id.playerMapView);
+
+
     // If Local Multiplayer
       // Set Opponent not AI
       // startReadingNetworkMessages();
-    if (NetworkAdapter.hasConnection()) {
+    //if (NetworkAdapter.hasConnection()) {
       //if there is a multiplayer game, disable the AI difficulty change setting
-      opponentSelect.setEnabled(false);
-      strategyDescription.setText(getString(R.string.wifi_p2p_opponent));
-      startReadingNetworkMessages();
-    } else {
-//            toast("No connection with opponent"); //TODO used for debugging remove before submission, or add something else to indicate not connected
-    }
+      //opponentSelect.setEnabled(false);
+      //strategyDescription.setText(getString(R.string.wifi_p2p_opponent));
+      //startReadingNetworkMessages();
+    //} else {
+      //    toast("No connection with opponent"); //TODO used for debugging remove before submission, or add something else to indicate not connected
+    //}
   }
   ActivityResultLauncher<Intent> placementActivityLauncher = registerForActivityResult(
       new ActivityResultContracts.StartActivityForResult(),
@@ -60,8 +71,11 @@ public class MainActivity extends AppCompatActivity {
           if (result.getResultCode() == RESULT_OK) {
             Intent data = result.getData();
             ArrayList<String> xyList = data.getStringArrayListExtra("xyList");
-            int i = 0;
+            playerMapView = new MapView(ctx);
+            playerMapView.setMap(new Map());
             // Add sub to map
+            setSubPlacement(xyList);
+
             // Wait for Opponent to Place
             // 
             // Start Game Loop
@@ -71,6 +85,14 @@ public class MainActivity extends AppCompatActivity {
       }
   );
 
+  private void setSubPlacement(ArrayList<String> xyList){
+    for (int i =0; i<xyList.size(); i++){
+      String[] res = xyList.get(i).split(",");
+      int x = Integer.valueOf(res[0]);
+      int y = Integer.valueOf(res[1]);
+      playerMapView.getMap().cellAt(x,y).isSub = true;
+    }
+  }
   // ----------------- Bottom Display -------------------
   public void moveOrFightDisplay() {
     runOnUiThread(new Runnable() {

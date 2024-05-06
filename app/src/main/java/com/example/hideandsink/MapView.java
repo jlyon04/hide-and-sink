@@ -34,6 +34,7 @@ public class MapView extends View {
   public void setMap(Map map){
     this.map = map;
   }
+  public Map getMap(){return  this.map;}
   // TEST PUBLICS
   boolean placerMode=false;
 

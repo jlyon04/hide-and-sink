@@ -9,7 +9,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -22,6 +24,8 @@ public class MainActivity extends AppCompatActivity {
   private Player activePlayer, player;
   private ComputerPlayer opponent;
   private MapView playerMapView;
+  private Button fireButton, scopeButton, sonarButton;
+  TextView gameText;
   private Context ctx;
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -30,67 +34,56 @@ public class MainActivity extends AppCompatActivity {
     ctx=this;
 
     // Check for Continue Game
+    // Setup Game Manager with Players and Maps
+    // Basic Vs Computer
     Intent intent = getIntent();
+    game = new GameManager();
     if (intent==null){
-      //new game
-      game = new GameManager();
+      //failure??
+    }else{
+      ArrayList<String> xyList = intent.getStringArrayListExtra("xyList");
+      if (xyList == null){
+        // No Selection?? or Error??
+        xyList.add("1,1");
+        xyList.add("1,2");
+        xyList.add("1,3");
+      }
+      setSubPlacement(xyList);
     }
 
-    // User Place Subs
-    Intent subPlaceIntent = new Intent(this, PlacementActivity.class);
-    subPlaceIntent.putExtra("placeType", "subPlacementStart");
-    placementActivityLauncher.launch(subPlaceIntent);
+    //Set Computer Subs
+    game.getOpponentPlayer().placeSubRandomly();
 
+    // Setup Map Views, Text and Buttons
+    playerMapView = findViewById(R.id.playerMapView);
+    sonarButton = findViewById(R.id.sonarButton);
+    fireButton = findViewById(R.id.fireButton);
+    scopeButton = findViewById(R.id.scopeButton);
+    sonarButton.setOnClickListener(sonarClick);
+    gameText = findViewById(R.id.gameText);
 
-    // Set up Computer Opponent + Map with Sub Placed Randomly
-    //opponent = new ComputerPlayer();
-    //opponent.setPlayerMap(new Map());
-    //opponent.placeSubRandomly();
+    //TODO Player Ship Place Map
 
-    // Set up User Board
-    //playerMapView = findViewById(R.id.playerMapView);
+    //Set Boards
+    playerMapView.setMap(game.getPlayer().getMap());
 
+    // Update Display
+    updateTurnDisplay();
 
     // If Local Multiplayer
-      // Set Opponent not AI
-      // startReadingNetworkMessages();
     //if (NetworkAdapter.hasConnection()) {
-      //if there is a multiplayer game, disable the AI difficulty change setting
-      //opponentSelect.setEnabled(false);
-      //strategyDescription.setText(getString(R.string.wifi_p2p_opponent));
       //startReadingNetworkMessages();
     //} else {
       //    toast("No connection with opponent"); //TODO used for debugging remove before submission, or add something else to indicate not connected
     //}
   }
-  ActivityResultLauncher<Intent> placementActivityLauncher = registerForActivityResult(
-      new ActivityResultContracts.StartActivityForResult(),
-      new ActivityResultCallback<ActivityResult>() {
-        @Override
-        public void onActivityResult(ActivityResult result) {
-          if (result.getResultCode() == RESULT_OK) {
-            Intent data = result.getData();
-            ArrayList<String> xyList = data.getStringArrayListExtra("xyList");
-            playerMapView = new MapView(ctx);
-            playerMapView.setMap(new Map());
-            // Add sub to map
-            setSubPlacement(xyList);
-
-            // Wait for Opponent to Place
-            // 
-            // Start Game Loop
-            //
-          }
-        }
-      }
-  );
 
   private void setSubPlacement(ArrayList<String> xyList){
     for (int i =0; i<xyList.size(); i++){
       String[] res = xyList.get(i).split(",");
       int x = Integer.valueOf(res[0]);
       int y = Integer.valueOf(res[1]);
-      playerMapView.getMap().cellAt(x,y).isSub = true;
+      game.getPlayer().getMap().cellAt(x,y).setSub();
     }
   }
   // ----------------- Bottom Display -------------------
@@ -99,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
       @Override
       public void run() {
         TextView textView = new TextView(ctx);
-        LinearLayout bottomLayout = findViewById(R.id.gameButtonLayout);
+        LinearLayout bottomLayout = findViewById(R.id.gameButtonsLayout);
         //textView.setPadding();
         Button moveBtn = new Button(ctx);
         moveBtn.setText("Move");
@@ -118,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
       @Override
       public void run() {
         TextView textView = new TextView(ctx);
-        LinearLayout bottomLayout = findViewById(R.id.gameButtonLayout);
+        LinearLayout bottomLayout = findViewById(R.id.gameButtonsLayout);
         //textView.setPadding();
         Button sonarBtn = new Button(ctx);
         Button scopeBtn = new Button(ctx);
@@ -131,17 +124,75 @@ public class MainActivity extends AppCompatActivity {
       }
     });
   }
-  // Wait for opponent turn
+
+  public void updateOffenseButtons() {
+    runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        LinearLayout buttonsLayout = findViewById(R.id.gameButtonsLayout);
+        LinearLayout buttonsLayout2 = findViewById(R.id.gameButtonsLayout2);
+        buttonsLayout.setVisibility(View.GONE);
+        buttonsLayout2.setVisibility(View.VISIBLE);
+      }
+    });
+  }
   public void updateTurnDisplay() {
     runOnUiThread(new Runnable() {
       @Override
       public void run() {
-        TextView textView = new TextView(ctx);
-        LinearLayout bottomLayout = findViewById(R.id.gameButtonLayout);
-        //textView.setPadding();
-        textView.setText(R.string.opponent_turn);
-        bottomLayout.addView(textView);
+        // Opponents Turn
+        if (game.getOpponentPlayer() == game.getActivePlayer()){
+          gameText.setText("Opponents Turn");
+        }else{
+          gameText.setText("Your Turn");
+          //TODO change text based on turn 1 or 2.
+          //Remove option if selected, remove move if not selected first.
+        }
       }
     });
   }
+
+  View.OnClickListener sonarClick = new View.OnClickListener() {
+    @Override
+    public void onClick(View view) {
+      // Start Listener and Place the selector boxes
+      playerMapView.setOnTouchListener(sonarMapTouch);
+      // Replace Buttons with Back and Confirm
+      updateOffenseButtons();
+    }
+  };
+
+
+  private View.OnTouchListener sonarMapTouch = new View.OnTouchListener(){
+    @Override
+    public boolean onTouch(View view, MotionEvent motionEvent) {
+      //Remove Old Placers
+      game.getPlayer().getMap().removeAllPlacers();
+
+      //if (xyList != null){
+      //xyList.clear();
+      //}
+      //Refresh View
+      playerMapView.invalidate();
+      if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+        int xy = playerMapView.locatePlace(motionEvent.getX(), motionEvent.getY());
+        int x = xy / 100;
+        int y = xy % 100;
+        //Todo testing
+        // -------------- SONAR PLACEMENT -------------
+        //handle out of bounds
+        if(y>6)
+          y=6;
+        if (x>6)
+          x=6;
+        game.getPlayer().getMap().cellAt(x, y).isPlace = true;
+        game.getPlayer().getMap().cellAt(x, y + 1).isPlace = true;
+        game.getPlayer().getMap().cellAt(x+1, y).isPlace = true;
+        game.getPlayer().getMap().cellAt(x+1, y + 1).isPlace = true;
+      }
+      return false;
+    }
+  };
+
+
 }

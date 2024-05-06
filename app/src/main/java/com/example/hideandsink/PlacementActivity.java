@@ -44,6 +44,10 @@ public class PlacementActivity extends AppCompatActivity {
     rotateBtn = findViewById(R.id.rotateSubBtn);
     rotateBtn.setOnClickListener(rotateClick);
   }
+
+  //-------------------------- Listeners ---------------------------------
+
+  // Map Touch Listener - Place Sub
   private View.OnTouchListener mapTouch = new View.OnTouchListener(){
     @Override
     public boolean onTouch(View view, MotionEvent motionEvent) {
@@ -128,8 +132,6 @@ public class PlacementActivity extends AppCompatActivity {
       return false;
     }
   };
-
-
   //Confirm Button
   private View.OnClickListener confirmClick = new View.OnClickListener() {
     @Override
@@ -140,10 +142,14 @@ public class PlacementActivity extends AppCompatActivity {
         return;
       }
       // Return from Activity XY list
-      Intent retIntent = new Intent();
-      retIntent.putStringArrayListExtra("xyList", xyList);
-      setResult(RESULT_OK, retIntent);
-      finish();
+      //Intent retIntent = new Intent();
+      //retIntent.putStringArrayListExtra("xyList", xyList);
+      //setResult(RESULT_OK, retIntent);
+      //finish();
+
+      Intent mainIntent = new Intent(view.getContext(), MainActivity.class);
+      mainIntent.putStringArrayListExtra("xyList", xyList);
+      startActivity(mainIntent);
     }
   };
   // Rotate Button
@@ -159,13 +165,4 @@ public class PlacementActivity extends AppCompatActivity {
       mapView.invalidate();
     }
   };
-
-
-
-  // Continue to Main Game
-  public void startMainGame(View view){
-
-  }
-  // Game Manager Must Be Parceable/Serializable
-
 }

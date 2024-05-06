@@ -13,6 +13,7 @@
         android:gravity="center_horizontal">
 
         <LinearLayout
+            android:id="@+id/gameTopLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
             <com.example.hideandsink.MapView
@@ -25,7 +26,7 @@
 
 
         <LinearLayout
-            android:id="@+id/gameButtonLayout"
+            android:id="@+id/gameBottomLayout"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="0.5"
@@ -34,6 +35,67 @@
             android:orientation="vertical"
             android:gravity="center_horizontal">
 
+            <LinearLayout
+                android:id="@+id/gameButtonsLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/sonarButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Sonar"
+                    />
+                <Button
+                    android:id="@+id/scopeButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Scope"
+                    />
+                <Button
+                    android:id="@+id/fireButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Fire"
+                    />
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/gameButtonsLayout2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/confirmBtn"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Confirm"
+                    />
+                <Button
+                    android:id="@+id/backBtn"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Back"
+                    />
+
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginTop="5dp"
+                android:layout_weight="1">
+                <TextView
+                    android:id="@+id/gameText"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"/>
+            </LinearLayout>
         </LinearLayout>
 
     </LinearLayout>

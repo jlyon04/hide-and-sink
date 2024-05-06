@@ -9,7 +9,7 @@ public class GameManager {
   GameManager(){
     player1 = new Player();
     player2 = new ComputerPlayer();
-    //randomize this??
+    //todo randomize this??
     activePlayer=player1;
   }
 
@@ -29,5 +29,14 @@ public class GameManager {
    }
  }
 
+ public Player getPlayer(){
+    return player1;
+ }
+  public Player getOpponentPlayer(){
+    return player2;
+  }
+  public Player getActivePlayer(){
+    return activePlayer;
+  }
 
 }

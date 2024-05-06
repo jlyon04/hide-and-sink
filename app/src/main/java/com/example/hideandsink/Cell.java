@@ -29,4 +29,7 @@ public class Cell {
     this.isShotHit=false;
     this.isShotMiss=false;
   }
+  public void setSub(){
+    isSub = true;
+  }
 }

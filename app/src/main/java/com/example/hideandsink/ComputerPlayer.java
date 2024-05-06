@@ -14,20 +14,5 @@ public class ComputerPlayer extends Player{
     super.setPlayerMap(map);
   }
 
-  public void placeSubRandomly(){
-    //return a random xy in the correct range
-    Random rng = new Random();
-    // if true then ship is horizontal
-    boolean orientation = rng.nextBoolean();
-
-    int temp1 = rng.nextInt();
-    int temp2 = rng.nextInt();
-
-    //get board size
-    //calc max values based on orientation
-    playerMap.cellAt(temp1, temp2).isSub = true;
-    playerMap.cellAt(temp1, temp2).isSub = true;
-
-  }
 
 }

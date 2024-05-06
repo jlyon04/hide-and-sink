@@ -18,8 +18,9 @@ public class MainMenu extends AppCompatActivity {
     newGameButton.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
-        //Start New Activity
-        Intent intent = new Intent(view.getContext(), MainActivity.class);
+        //Start Placement Activity
+        Intent intent = new Intent(view.getContext(), PlacementActivity.class);
+        intent.putExtra("placeType", "subPlacementStart");
         //Should I change this to a launcher?
         view.getContext().startActivity(intent);
       }

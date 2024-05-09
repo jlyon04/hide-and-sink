@@ -1,5 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <!-- Red -->
+    <color name="red">#FF0000</color>
+    <color name="dark_red">#8B0000</color>
+    <color name="light_red">#FFC0CB</color>
+
+    <!-- Blue -->
+    <color name="blue">#0000FF</color>
+    <color name="dark_blue">#00008B</color>
+    <color name="light_blue">#ADD8E6</color>
+
+    <!-- Green -->
+    <color name="green">#008000</color>
+    <color name="dark_green">#006400</color>
+    <color name="light_green">#90EE90</color>
+
+    <!-- Yellow -->
+    <color name="yellow">#FFFF00</color>
+    <color name="dark_yellow">#808000</color>
+    <color name="light_yellow">#FFFFE0</color>
+
+    <!-- Orange -->
+    <color name="orange">#FFA500</color>
+    <color name="dark_orange">#FF8C00</color>
+    <color name="light_orange">#FFD700</color>
+
+    <!-- Purple -->
+    <color name="purple">#800080</color>
+    <color name="dark_purple">#4B0082</color>
+    <color name="light_purple">#E6E6FA</color>
+
+    <!-- Pink -->
+    <color name="pink">#FFC0CB</color>
+    <color name="dark_pink">#FF1493</color>
+    <color name="light_pink">#FFB6C1</color>
+
+    <!-- Gray -->
+    <color name="gray">#808080</color>
+    <color name="dark_gray">#A9A9A9</color>
+    <color name="light_gray">#D3D3D3</color>
+
+    <!-- Brown -->
+    <color name="brown">#A52A2A</color>
+    <color name="dark_brown">#8B4513</color>
+    <color name="light_brown">#BC8F8F</color>
+
+    <!-- White -->
+    <color name="white">#FFFFFF</color>
+
+    <!-- Black -->
+    <color name="black">#000000</color>
 </resources>

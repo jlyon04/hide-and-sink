@@ -2,21 +2,22 @@ package com.example.hideandsink;
 
 public class GameManager {
   private Player activePlayer;
-  private Player player1, player2;
+  private Player player1;
+  private ComputerPlayer opponent;
 
 
   //New Game
   GameManager(){
     player1 = new Player();
-    player2 = new ComputerPlayer();
+    opponent = new ComputerPlayer();
     //todo randomize this??
     activePlayer=player1;
   }
 
   // New Game with Computer
- GameManager(Map player1Map, Map player2Map, int playerTurn){
+ GameManager(Map player1Map, Map opponentMap, int playerTurn){
    player1 = new Player(player1Map);
-   player2 = new ComputerPlayer(player2Map);
+   opponent = new ComputerPlayer(opponentMap);
 
    // Set Who's turn
    switch (playerTurn){
@@ -24,7 +25,7 @@ public class GameManager {
        activePlayer=player1;
        break;
      case 1:
-       activePlayer=player2;
+       activePlayer=opponent;
        break;
    }
  }
@@ -33,10 +34,27 @@ public class GameManager {
     return player1;
  }
   public Player getOpponentPlayer(){
-    return player2;
+    return opponent;
   }
   public Player getActivePlayer(){
     return activePlayer;
+  }
+  public void changeTurn(){
+    if(activePlayer==player1){
+      activePlayer = opponent;
+    }
+    else{
+      activePlayer=player1;
+    }
+  }
+
+  String computerAttack(){
+    computerAttack1();
+    return "true";
+  }
+  String computerAttack1(){
+    String moveStr = opponent.chooseAttack1(opponent.getMap());
+    return moveStr;
   }
 
 }

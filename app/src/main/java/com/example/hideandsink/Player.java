@@ -1,11 +1,14 @@
 package com.example.hideandsink;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 public class Player{
   private Map playerMap = null;
   private int health = 0;
 
+  //todo remove this or private??
+  public ArrayList<int[]> subLocation = new ArrayList<>();
 
   Player(){
     playerMap = new Map();
@@ -36,6 +39,10 @@ public class Player{
       playerMap.cellAt(temp1,temp2).setSub();
       playerMap.cellAt(temp1+1,temp2).setSub();
       playerMap.cellAt(temp1+2,temp2).setSub();
+      //todo remove this ??
+      subLocation.add(new int[]{temp1, temp2});
+      subLocation.add(new int[]{temp1+1, temp2});
+      subLocation.add(new int[]{temp1+2, temp2});
     }
     else{
       // Vertical
@@ -44,8 +51,10 @@ public class Player{
       playerMap.cellAt(temp1,temp2).setSub();
       playerMap.cellAt(temp1,temp2+1).setSub();
       playerMap.cellAt(temp1,temp2+2).setSub();
+      subLocation.add(new int[]{temp1, temp2});
+      subLocation.add(new int[]{temp1, temp2+1});
+      subLocation.add(new int[]{temp1, temp2+2});
     }
-
   }
 
 }

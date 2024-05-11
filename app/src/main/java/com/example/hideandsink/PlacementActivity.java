@@ -43,6 +43,14 @@ public class PlacementActivity extends AppCompatActivity {
     confirmBtn.setOnClickListener(confirmClick);
     rotateBtn = findViewById(R.id.rotateSubBtn);
     rotateBtn.setOnClickListener(rotateClick);
+
+    // Set Starting Placers
+    map.cellAt(0, 0).isPlace = true;
+    map.cellAt(0,  1).isPlace = true;
+    map.cellAt(0,  2).isPlace = true;
+    xyList.add(("0") + "," + ("0"));
+    xyList.add(("0") + "," + ("1"));
+    xyList.add(("0") + "," + ("2"));
   }
 
   //-------------------------- Listeners ---------------------------------
@@ -141,12 +149,6 @@ public class PlacementActivity extends AppCompatActivity {
         // FAIL - Alert User, Must have a selection
         return;
       }
-      // Return from Activity XY list
-      //Intent retIntent = new Intent();
-      //retIntent.putStringArrayListExtra("xyList", xyList);
-      //setResult(RESULT_OK, retIntent);
-      //finish();
-
       Intent mainIntent = new Intent(view.getContext(), MainActivity.class);
       mainIntent.putStringArrayListExtra("xyList", xyList);
       startActivity(mainIntent);
@@ -156,8 +158,6 @@ public class PlacementActivity extends AppCompatActivity {
   private View.OnClickListener rotateClick = new View.OnClickListener() {
     @Override
     public void onClick(View view) {
-      xyList.clear();
-      map.removeAllPlacers();
       if(dir)
         dir=false;
       else

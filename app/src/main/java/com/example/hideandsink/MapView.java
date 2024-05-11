@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.ImageView;
 
 import androidx.annotation.Nullable;
+import androidx.core.content.res.ResourcesCompat;
 
 public class MapView extends View {
   public MapView(Context context) {
@@ -65,7 +66,7 @@ public class MapView extends View {
     }
   }
 
-  void drawShipPlacer(Canvas canvas, int x, int y){
+  void drawShipPlacer(Canvas canvas, int x, int y, Drawable d){
     float viewSize = maxCoord();
     float tileSize = viewSize / 8;  //8 Is how many tiles there are
     float offSet = 8;
@@ -73,7 +74,7 @@ public class MapView extends View {
     int viewSize2 = Math.round(maxCoord());
     int tileSize2 = Math.round( viewSize/ 8);  //8 Is how many tiles there are
     //canvas.drawRect((tileSize* x) + offSet, (tileSize*y) + offSet, ((tileSize * x)+tileSize) - offSet, (((viewSize/10) * y)+tileSize) - offSet, dotted_black);
-    Drawable d = getResources().getDrawable(R.drawable.sub_place_sq, null);
+    //Drawable d = getResources().getDrawable(R.drawable.sub_place_sq, null);
     int left = (tileSize2* x) + offSet2;
     int top =(tileSize2*y) + offSet2;
     int right =((tileSize2 * x)+tileSize2) - offSet2;
@@ -85,6 +86,15 @@ public class MapView extends View {
   private void drawShips(Canvas canvas){}
   private void drawShipHitCell(Canvas canvas){}
 
+  public void drawSquare(Canvas canvas, int color, int x, int y){
+    Paint tempPaint = new Paint();
+    tempPaint.setColor(color);
+    float viewSize = Math.round(maxCoord());
+    float tileSize = Math.round(viewSize / 8);  //10 Is how many tiles there are
+    float offSet = 8;
+    canvas.drawRect((tileSize* x) + offSet, (tileSize*y) + offSet, ((tileSize * x)+tileSize) - offSet, (((viewSize/8) * y)+tileSize) - offSet, tempPaint);
+  }
+
   private void drawCellOptions(Canvas canvas){
     if (map == null){
       //TODO Debug Option
@@ -93,19 +103,40 @@ public class MapView extends View {
     }
     for(int x = 0; x < mapSize; x++){
       for(int y = 0; y < mapSize; y++){
+
+        // Sub Location
+        if(map.cellAt(x, y).getIsSub()) {
+
+        }
+        // Sonar Hit
+        if(map.cellAt(x,y).getIsSonarHit()){
+          drawSquare(canvas, ResourcesCompat.getColor(getResources(), R.color.pink, null), x, y);
+        }
+        // Sonar Miss
+        else if(map.cellAt(x,y).getIsSonarMiss()){
+          //drawShipPlacer(canvas, x, y, getResources().getDrawable(R.drawable.radar, null));
+          drawSquare(canvas, ResourcesCompat.getColor(getResources(), R.color.green, null), x, y);
+        }
+        // Scope Hit
+        if(map.cellAt(x,y).getIsScopeHit()){
+          drawSquare(canvas, ResourcesCompat.getColor(getResources(), R.color.orange, null), x, y);
+        }
+        // Scope Miss
+        else if(map.cellAt(x,y).getIsScopeMiss()){
+          drawSquare(canvas, ResourcesCompat.getColor(getResources(), R.color.yellow, null), x, y);
+        }
+        // Fire Hit
+        if(map.cellAt(x,y).getIsFireHit()){
+          drawSquare(canvas, ResourcesCompat.getColor(getResources(), R.color.red, null), x, y);
+        }
+        // Fire Miss
+        else if(map.cellAt(x,y).getIsFireMiss()){
+          drawSquare(canvas, ResourcesCompat.getColor(getResources(), R.color.blue, null), x, y);
+        }
         // Placer
         if(map.cellAt(x, y).isPlace){
-          drawShipPlacer(canvas, x, y);
+          drawShipPlacer(canvas, x, y, getResources().getDrawable(R.drawable.sub_place_sq, null));
         }
-        // Sub Location
-        if(map.cellAt(x, y).isSub) {
-        }
-        // Scope Fail
-        // Scope Hit
-        // Fire Fail
-        // Fire Hit
-        // Sonar Fail
-        // Sonar Hit
       }
     }
   }

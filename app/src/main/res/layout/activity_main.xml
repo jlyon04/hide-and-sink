@@ -124,10 +124,45 @@
                     android:gravity="center"
                     android:text="Waiting"
                     android:layout_height="35dp"/>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="35dp"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:textSize="25dp"
+                        android:text="Player Health:"
+                        android:layout_height="35dp"/>
+                    <TextView
+                        android:id="@+id/playerHealthText"
+                        android:layout_marginLeft="10dp"
+                        android:layout_width="wrap_content"
+                        android:textSize="25dp"
+                        android:text="n/a"
+                        android:layout_height="35dp"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="35dp"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:textSize="25dp"
+                        android:text="Opponent Health:"
+                        android:layout_height="35dp"/>
+                    <TextView
+                        android:id="@+id/oppHealthText"
+                        android:layout_marginLeft="10dp"
+                        android:layout_width="wrap_content"
+                        android:textSize="25dp"
+                        android:text="n/a"
+                        android:layout_height="35dp"/>
+                </LinearLayout>
+
                 <TextView
                     android:id="@+id/debugText"
                     android:layout_width="match_parent"
-                    android:layout_height="35dp"/>
+                    android:layout_height="25dp"/>
             </LinearLayout>
         </LinearLayout>
 

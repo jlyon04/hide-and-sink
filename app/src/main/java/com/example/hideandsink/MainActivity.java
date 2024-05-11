@@ -26,12 +26,12 @@ public class MainActivity extends AppCompatActivity {
   private ComputerPlayer opponent;
   private MapView playerMapView;
   private Button fireButton, scopeButton, sonarButton, confirmButton, backButton, moveButton, rotateButton;
-  TextView gameText;
+  TextView gameText, playerHealthText, opponentHealthText;
   LinearLayout offenseSelectionLayout, confirmSelectionLayout;
   private Context ctx;
   private String offenseChoice;
   private boolean onSecondTurn, dir;
-  ArrayList<int[]> placerArray=new ArrayList<int[]>();
+  ArrayList<String> placerArray=new ArrayList<>();
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -71,6 +71,9 @@ public class MainActivity extends AppCompatActivity {
     moveButton = findViewById(R.id.moveBtn);
     rotateButton = findViewById(R.id.rotateBtn);
     gameText = findViewById(R.id.gameText);
+    playerHealthText = findViewById(R.id.playerHealthText);
+    opponentHealthText = findViewById(R.id.oppHealthText);
+
 
     // Listeners
     sonarButton.setOnClickListener(sonarClick);
@@ -82,6 +85,10 @@ public class MainActivity extends AppCompatActivity {
 
     //Set Boards
     playerMapView.setMap(game.getPlayer().getMap());
+
+    //Displya Player Health
+    playerHealthText.setText(String.valueOf(game.getPlayer().health));
+    opponentHealthText.setText(String.valueOf(game.getOpponentPlayer().health));
 
     // Update Display
     updateTurnDisplay();
@@ -111,6 +118,19 @@ public class MainActivity extends AppCompatActivity {
     }
   }
   // ----------------- Bottom Display -------------------
+
+  public void disableAllBtns(){
+    moveButton.setEnabled(false);
+    sonarButton.setEnabled(false);
+    scopeButton.setEnabled(false);
+    fireButton.setEnabled(false);
+  }
+  public void enableAllBtns(){
+    moveButton.setEnabled(true);
+    sonarButton.setEnabled(true);
+    scopeButton.setEnabled(true);
+    fireButton.setEnabled(true);
+  }
   public void moveOrFightDisplay() {
     runOnUiThread(new Runnable() {
       @Override
@@ -126,24 +146,6 @@ public class MainActivity extends AppCompatActivity {
         bottomLayout.addView(textView);
         bottomLayout.addView(fightBtn);
         bottomLayout.addView(moveBtn);
-      }
-    });
-  }
-  public void offensiveOptionDisplay() {
-    runOnUiThread(new Runnable() {
-      @Override
-      public void run() {
-        TextView textView = new TextView(ctx);
-        LinearLayout bottomLayout = findViewById(R.id.gameButtonsLayout);
-        //textView.setPadding();
-        Button sonarBtn = new Button(ctx);
-        Button scopeBtn = new Button(ctx);
-        Button shootBtn = new Button(ctx);
-        textView.setText(R.string.choose_attack);
-        bottomLayout.addView(textView);
-        bottomLayout.addView(sonarBtn);
-        bottomLayout.addView(scopeBtn);
-        bottomLayout.addView(shootBtn);
       }
     });
   }
@@ -174,11 +176,12 @@ public class MainActivity extends AppCompatActivity {
       public void run() {
         // Opponents Turn
         if (game.getOpponentPlayer() == game.getActivePlayer()){
-          gameText.setText("Opponents Turn");
+          gameText.setText("Opponents Turn Please Wait");
         }else{
           gameText.setText("Your Turn");
           //TODO change text based on turn 1 or 2.
           //Remove option if selected, remove move if not selected first.
+          enableAllBtns();
         }
       }
     });
@@ -212,76 +215,46 @@ public class MainActivity extends AppCompatActivity {
       // Sonar
       if (offenseChoice.equals("sonar")) {
         sonarButton.setEnabled(false);
-        // Check for Sonar hit or miss
-        for (int i = 0; i < placerArray.size(); i++) {
-          int[] temp = placerArray.get(i);
-          int x = temp[0];
-          int y = temp[1];
-          // Set Cell color based on opponent board
-          if (game.getOpponentPlayer().getMap().cellAt(x, y).getIsSub()) {
-            //Color SONAR HIT
-            paintSonarHit();
-            //Hoping this breaks me from for loop??
-            break;
-          }else{
-            //This should only hit if it is the last iteration and no sub has been found
-            if (i == placerArray.size()-1){
-              //No Sub Hit Color all: Miss
-              paintSonarMiss();
-            }
-          }
-        }
-
-
+        game.placeSonar(placerArray, "player");
       }
       else if (offenseChoice.equals("scope")) {
         scopeButton.setEnabled(false);
-        for (int i = 0; i < placerArray.size(); i++) {
-          int[] temp = placerArray.get(i);
-          int x = temp[0];
-          int y = temp[1];
-          if (game.getOpponentPlayer().getMap().cellAt(x, y).getIsSub()) {
-            game.getPlayer().getMap().cellAt(x, y).setScopeHit();
-          } else {
-            game.getPlayer().getMap().cellAt(x, y).setScopeMiss();
-          }
-        }
+        game.placeScope(placerArray, "player");
       }
       else if (offenseChoice.equals("fire")) {
+        game.placeFire(placerArray, "player");
       }
 
       //TODO Check Player Won??
+      if (game.getOpponentPlayer().health == 0){
+        //game over
+        int io = 0;
+      }
+
+      //Update UI
+      game.getPlayer().getMap().removeAllPlacers();
+      playerMapView.invalidate();
 
       // Change Turns
       if (onSecondTurn){
-        //Grey Out Buttons
-        sonarButton.setEnabled(false);
-        scopeButton.setEnabled(false);
-        fireButton.setEnabled(false);
-        moveButton.setEnabled(false);
-        //Switch Turns
+        //Update Display
+        disableAllBtns();
         showOffenseButtons();
         game.changeTurn();
-        //Update Turn Display
-        gameText.setText("Opponents Turn Please Wait");
+        updateTurnDisplay();
+        playerMapView.invalidate();
         //Clear offenseChoice??
         onSecondTurn=false;
+        computerTurn();
       }else{
         onSecondTurn = true;
         offenseChoice = null;
         //return with move and sonar disabled
         showOffenseButtons();
       }
-      //Update UI
-      //CAn I move these out of if and to the bottom??
-      game.getPlayer().getMap().removeAllPlacers();
       playerMapView.invalidate();
-
       // Remove Listener
       playerMapView.setOnTouchListener(null);
-
-      // If Computer
-      computerTurn();
     }
   };
 
@@ -321,10 +294,10 @@ public class MainActivity extends AppCompatActivity {
         game.getPlayer().getMap().cellAt(x + 1, y + 1).isPlace = true;
 
         //set Global Variable
-        placerArray.add(new int[]{x, y});
-        placerArray.add(new int[]{x, y + 1});
-        placerArray.add(new int[]{x + 1, y});
-        placerArray.add(new int[]{x + 1, y + 1});
+        placerArray.add(String.valueOf(x)+","+y);
+        placerArray.add(String.valueOf(x)+","+(y+1));
+        placerArray.add(String.valueOf(x+1)+","+(y));
+        placerArray.add(String.valueOf(x+1)+","+(y+1));
         return true;
       }
       return false;
@@ -356,8 +329,8 @@ public class MainActivity extends AppCompatActivity {
           game.getPlayer().getMap().cellAt(x, y+1).isPlace = true;
 
           //set Placer array for confirmation
-          placerArray.add(new int[]{x, y});
-          placerArray.add(new int[]{x, y + 1});
+          placerArray.add((x)+","+(y));
+          placerArray.add((x)+","+(y+1));
 
         }else {
           if (x>6)
@@ -367,36 +340,21 @@ public class MainActivity extends AppCompatActivity {
           game.getPlayer().getMap().cellAt(x+1, y).isPlace = true;
 
           //set Placer array for confirmation
-          placerArray.add(new int[]{x, y});
-          placerArray.add(new int[]{x+1, y});
+          placerArray.add((x)+","+(y));
+          placerArray.add((x+1)+","+(y));
+
         }
         return true;
       }
       return false;
     }
   };
-  private void paintSonarHit() {
-    for (int j = 0; j < placerArray.size(); j++) {
-      int[] temp = placerArray.get(j);
-      int x = temp[0];
-      int y = temp[1];
-      game.getPlayer().getMap().cellAt(x, y).setSonarHit();
-    }
-  }
-  private void paintSonarMiss() {
-    for (int j = 0; j < placerArray.size(); j++) {
-      int[] temp = placerArray.get(j);
-      int x = temp[0];
-      int y = temp[1];
-      game.getPlayer().getMap().cellAt(x, y).setSonarMiss();
-    }
-  }
+
   public void resetPlacerArray(){
     placerArray.clear();
   }
 
   void computerTurn(){
-    //place attack 1
     //game.getOpponentPlayer().getMap()
     //;sleep
     // Check if play was a move
@@ -407,9 +365,11 @@ public class MainActivity extends AppCompatActivity {
     Thread thread = new Thread(new Runnable() {
       @Override
       public void run() {
-        //Attack 1
-        String atk1 = game.computerAttack1();
+        game.computerAttack();
 
+        game.changeTurn();
+
+        updateTurnDisplay();
       }
     });
     thread.start();

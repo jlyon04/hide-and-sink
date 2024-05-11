@@ -1,5 +1,6 @@
 package com.example.hideandsink;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 public class StrategyBasic implements StategyInterface{
@@ -12,7 +13,7 @@ public class StrategyBasic implements StategyInterface{
   }
 
   @Override
-  public String chooseAttack1(Map map) {
+  public ArrayList<String> chooseAttack1(Map map) {
     //read board
     for(int y=0;y<map.size();y++){
       for(int x=0;x<map.size();x++){
@@ -21,7 +22,6 @@ public class StrategyBasic implements StategyInterface{
         }
         // If Scope and No Fire Hit - Fire
         if (map.cellAt(x,y).getIsScopeHit() && !map.cellAt(x,y).getIsFireHit()){
-          return ("fire,"+x+y);
           //fire
         }
       }
@@ -30,7 +30,7 @@ public class StrategyBasic implements StategyInterface{
   }
 
   @Override
-  public String chooseAttack2(Map map) {
+  public ArrayList<String> chooseAttack2(Map map, String lastAtk) {
     return null;
   }
 

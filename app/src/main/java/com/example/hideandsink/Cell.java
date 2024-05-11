@@ -81,6 +81,9 @@ public class Cell {
     isSub = true;
   }
 
+  public void setSub(boolean isSubV){
+    isSub=isSubV;
+  }
   public void resetCell(){
     this.isPlace=false;
     this.isSub=false;

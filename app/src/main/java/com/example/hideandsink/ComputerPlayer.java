@@ -5,8 +5,6 @@ import java.util.Random;
 public class ComputerPlayer extends Player{
   private StategyInterface strategyInterface;
   private Map playerMap = null;
-  public int health = 2;
-  //private Strategy strategy;
   ComputerPlayer(){
     super();
     placeSubRandomly();

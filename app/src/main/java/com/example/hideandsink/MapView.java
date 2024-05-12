@@ -7,7 +7,6 @@ import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.View;
-import android.widget.ImageView;
 
 import androidx.annotation.Nullable;
 import androidx.core.content.res.ResourcesCompat;
@@ -66,19 +65,28 @@ public class MapView extends View {
     }
   }
 
-  void drawShipPlacer(Canvas canvas, int x, int y, Drawable d){
+  void drawShipPlacer(Canvas canvas, int x, int y){
     float viewSize = maxCoord();
-    float tileSize = viewSize / 8;  //8 Is how many tiles there are
-    float offSet = 8;
     int offSet2 = 8;
     int viewSize2 = Math.round(maxCoord());
     int tileSize2 = Math.round( viewSize/ 8);  //8 Is how many tiles there are
-    //canvas.drawRect((tileSize* x) + offSet, (tileSize*y) + offSet, ((tileSize * x)+tileSize) - offSet, (((viewSize/10) * y)+tileSize) - offSet, dotted_black);
-    //Drawable d = getResources().getDrawable(R.drawable.sub_place_sq, null);
     int left = (tileSize2* x) + offSet2;
     int top =(tileSize2*y) + offSet2;
     int right =((tileSize2 * x)+tileSize2) - offSet2;
     int bottom = (((viewSize2/8) * y)+tileSize2) - offSet2;
+    Drawable d = getResources().getDrawable(R.drawable.sub_place_sq, null);
+    d.setBounds(left, top, right, bottom);
+    d.draw(canvas);
+  }
+
+  void drawPNG(Canvas canvas, int x, int y, Drawable d){
+    int offSet = 8;
+    int viewSize = Math.round(maxCoord());
+    int tileSize = Math.round( viewSize/ 8);  //8 Is how many tiles there are
+    int left = (tileSize* x) + offSet;
+    int top =(tileSize*y) + offSet;
+    int right =((tileSize * x)+tileSize) - offSet;
+    int bottom = (((viewSize/8) * y)+tileSize) - offSet;
     d.setBounds(left, top, right, bottom);
     d.draw(canvas);
   }
@@ -110,7 +118,7 @@ public class MapView extends View {
         }
         // Sonar Hit
         if(map.cellAt(x,y).getIsSonarHit()){
-          drawSquare(canvas, ResourcesCompat.getColor(getResources(), R.color.pink, null), x, y);
+          drawPNG(canvas, x, y, getResources().getDrawable(R.drawable.radar_red));
         }
         // Sonar Miss
         else if(map.cellAt(x,y).getIsSonarMiss()){
@@ -135,7 +143,7 @@ public class MapView extends View {
         }
         // Placer
         if(map.cellAt(x, y).isPlace){
-          drawShipPlacer(canvas, x, y, getResources().getDrawable(R.drawable.sub_place_sq, null));
+          drawShipPlacer(canvas, x, y);
         }
       }
     }

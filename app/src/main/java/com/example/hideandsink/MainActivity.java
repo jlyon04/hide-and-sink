@@ -80,6 +80,7 @@ public class MainActivity extends AppCompatActivity {
     confirmButton.setOnClickListener(confirmClick);
     scopeButton.setOnClickListener(scopeClick);
     rotateButton.setOnClickListener(rotateClick);
+    fireButton.setOnClickListener(fireClick);
 
     //TODO Player Ship Place Map
 
@@ -167,6 +168,9 @@ public class MainActivity extends AppCompatActivity {
           moveButton.setEnabled(false);
           rotateButton.setVisibility((View.VISIBLE));
         }
+        if(offChoice.equals("fire")){
+          moveButton.setEnabled(false);
+        }
       }
     });
   }
@@ -208,6 +212,14 @@ public class MainActivity extends AppCompatActivity {
     }
   };
 
+  View.OnClickListener fireClick = new View.OnClickListener() {
+    @Override
+    public void onClick(View view) {
+      playerMapView.setOnTouchListener(fireMapTouch);
+      showConfirmButtons("fire");
+    }
+  };
+
   View.OnClickListener confirmClick = new View.OnClickListener() {
     @Override
     public void onClick(View view) {
@@ -223,10 +235,13 @@ public class MainActivity extends AppCompatActivity {
       }
       else if (offenseChoice.equals("fire")) {
         game.placeFire(placerArray, "player");
+        //update health??
+        opponentHealthText.setText(String.valueOf(game.getOpponentPlayer().health));
       }
 
       //TODO Check Player Won??
-      if (game.getOpponentPlayer().health == 0){
+      if (game.getOpponentPlayer().health < 1){
+        int test = game.getOpponentPlayer().health;
         //game over
         int io = 0;
       }
@@ -234,6 +249,7 @@ public class MainActivity extends AppCompatActivity {
       //Update UI
       game.getPlayer().getMap().removeAllPlacers();
       playerMapView.invalidate();
+      opponentHealthText.invalidate();
 
       // Change Turns
       if (onSecondTurn){
@@ -310,7 +326,6 @@ public class MainActivity extends AppCompatActivity {
       if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
         //Remove Old Placers
         game.getPlayer().getMap().removeAllPlacers();
-        //TODO change this to placer array and use for all placers
         if (placerArray.size() > 0)
           resetPlacerArray();
         //Translate Touch and Place isPlace squares
@@ -344,6 +359,27 @@ public class MainActivity extends AppCompatActivity {
           placerArray.add((x+1)+","+(y));
 
         }
+        return true;
+      }
+      return false;
+    }
+  };
+
+  private View.OnTouchListener fireMapTouch = new View.OnTouchListener() {
+    @Override
+    public boolean onTouch(View view, MotionEvent motionEvent) {
+      if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+        game.getPlayer().getMap().removeAllPlacers();
+        if (placerArray.size() > 0)
+          resetPlacerArray();
+        playerMapView.invalidate();
+        int xy = playerMapView.locatePlace(motionEvent.getX(), motionEvent.getY());
+        int x = xy / 100;
+        int y = xy % 100;
+
+
+        game.getPlayer().getMap().cellAt(x, y).isPlace = true;
+        placerArray.add((x)+","+(y));
         return true;
       }
       return false;

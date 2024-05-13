@@ -152,9 +152,9 @@ public class PlacementActivity extends AppCompatActivity {
       Intent mainIntent = new Intent(view.getContext(), MainActivity.class);
       mainIntent.putStringArrayListExtra("xyList", xyList);
       startActivity(mainIntent);
+      finish();
     }
   };
-  // Rotate Button
   private View.OnClickListener rotateClick = new View.OnClickListener() {
     @Override
     public void onClick(View view) {

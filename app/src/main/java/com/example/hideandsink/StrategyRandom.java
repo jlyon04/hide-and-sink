@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class StrategyRandom implements StategyInterface{
-  ArrayList<String> atkStr=new ArrayList<>();
   Random rng = new Random();
   @Override
   public String getStrategyName() {
@@ -12,7 +11,7 @@ public class StrategyRandom implements StategyInterface{
   }
 
   @Override
-  public ArrayList<String> chooseAttack1(Map map) {
+  public ArrayList<String> chooseAttack1(Map map, int health){
     if(atkStr.size()>0){
       atkStr.clear();
     }

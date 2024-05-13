@@ -19,6 +19,8 @@ public class Cell {
   private boolean isSub;
   public boolean isPlace;
 
+  private String lastStatus=null;
+
   // Getter and setter for isSonarHit
   public boolean getIsSonarHit() {
     return isSonarHit;
@@ -26,6 +28,7 @@ public class Cell {
 
   public void setSonarHit() {
     isSonarHit = true;
+    lastStatus="sonarHit";
   }
 
   // Getter and setter for isSonarMiss
@@ -35,6 +38,7 @@ public class Cell {
 
   public void setSonarMiss() {
     isSonarMiss = true;
+    lastStatus="sonarMiss";
   }
 
   // Getter and setter for isScopeHit
@@ -44,6 +48,7 @@ public class Cell {
 
   public void setScopeHit() {
     isScopeHit = true;
+    lastStatus="scopeHit";
   }
 
   // Getter and setter for isScopeMiss
@@ -53,6 +58,7 @@ public class Cell {
 
   public void setScopeMiss() {
     isScopeMiss = true;
+    lastStatus="scopeMiss";
   }
 
   // Getter and setter for isShotHit
@@ -62,6 +68,7 @@ public class Cell {
 
   public void setFireHit() {
     isFireHit = true;
+    lastStatus="fireHit";
   }
 
   // Getter and setter for isShotMiss
@@ -71,6 +78,7 @@ public class Cell {
 
   public void setFireMiss() {
     isFireMiss = true;
+    lastStatus="fireMiss";
   }
 
   // Getter and Setter for isSub
@@ -80,7 +88,6 @@ public class Cell {
   public void setSub(){
     isSub = true;
   }
-
   public void setSub(boolean isSubV){
     isSub=isSubV;
   }
@@ -93,6 +100,14 @@ public class Cell {
     this.isScopeMiss=false;
     this.isFireHit=false;
     this.isFireMiss=false;
+    lastStatus=null;
   }
 
+  public String getLastStatus() {
+    return lastStatus;
+  }
+
+  public void setLastStatus(String lastStatus) {
+    this.lastStatus = lastStatus;
+  }
 }

@@ -52,12 +52,14 @@ public class GameManager {
 
 
   public boolean computerAttack(){
-    ArrayList<String> atkArray = opponent.chooseAttack1(opponent.getMap());
+    ArrayList<String> atkArray = opponent.chooseAttack1(opponent.getMap(), opponent.health);
     String offenseType=atkArray.get(0);
     atkArray.remove(0);
     switch (offenseType) {
       case "move":
         opponent.moveSub(atkArray);
+        //update debug list
+        setDebugLoc(atkArray);
         return false;
       case ("sonar"):
         placeSonar(atkArray, "opponent");
@@ -176,6 +178,15 @@ public class GameManager {
       else{
         opponent.getMap().cellAt(x,y).setFireMiss();
       }
+    }
+  }
+
+  private void setDebugLoc(ArrayList<String> locArray){
+    if (opponent.subLocation.size()>0)
+      opponent.subLocation.clear();
+    for(int i=0;i<locArray.size();i++){
+      String[] res = locArray.get(i).split(",");
+      opponent.subLocation.add(new int[]{Integer.valueOf(res[0]),Integer.valueOf(res[1])});
     }
   }
 

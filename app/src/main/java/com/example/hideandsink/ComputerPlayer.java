@@ -1,6 +1,5 @@
 package com.example.hideandsink;
 import java.util.ArrayList;
-import java.util.Random;
 
 public class ComputerPlayer extends Player{
   private StategyInterface strategyInterface;
@@ -17,8 +16,8 @@ public class ComputerPlayer extends Player{
   }
 
   /**Returns a place for the computer to shoot*/
-  ArrayList<String> chooseAttack1(Map opponentMap){
-    return strategyInterface.chooseAttack1(opponentMap);
+  ArrayList<String> chooseAttack1(Map opponentMap, int health){
+    return strategyInterface.chooseAttack1(opponentMap, health);
   }
   ArrayList<String> chooseAttack2(Map opponentMap, String lastAtk){
     return strategyInterface.chooseAttack2(opponentMap,lastAtk);

@@ -1,14 +1,20 @@
 package com.example.hideandsink;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +22,6 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -25,13 +30,18 @@ public class MainActivity extends AppCompatActivity {
   private Player activePlayer, player;
   private ComputerPlayer opponent;
   private MapView playerMapView;
-  private Button fireButton, scopeButton, sonarButton, confirmButton, backButton, moveButton, rotateButton;
+  private Button fireButton, scopeButton, sonarButton, confirmButton, backButton, moveButton, rotateButton, winButton;
   TextView gameText, playerHealthText, opponentHealthText;
+  Dialog winDialog;
+
+  //TODO remove this
+  TextView debugview;
   LinearLayout offenseSelectionLayout, confirmSelectionLayout;
   private Context ctx;
   private String offenseChoice;
   private boolean onSecondTurn, dir;
   ArrayList<String> placerArray=new ArrayList<>();
+  @SuppressLint("MissingInflatedId")
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -39,9 +49,16 @@ public class MainActivity extends AppCompatActivity {
     ctx=this;
     dir = true; //direction of placers: true = Vertical
 
-    // Check for Continue Game
+    // Handle Back Button
+    OnBackPressedCallback backMessage= new OnBackPressedCallback(true) {
+      @Override
+      public void handleOnBackPressed() {
+        exitMessageSetup();
+      }
+    };
+    getOnBackPressedDispatcher().addCallback(this, backMessage);
+
     // Setup Game Manager with Players and Maps
-    // Basic Vs Computer
     Intent intent = getIntent();
     game = new GameManager();
     if (intent==null){
@@ -74,6 +91,18 @@ public class MainActivity extends AppCompatActivity {
     playerHealthText = findViewById(R.id.playerHealthText);
     opponentHealthText = findViewById(R.id.oppHealthText);
 
+    // Dialog Box
+    winDialog = new Dialog(ctx);
+    winDialog.setContentView(R.layout.win_dialog);
+    winButton = winDialog.findViewById(R.id.winMenuBtn);
+    //winDialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+    //winDialog.setCancelable(false);
+    winDialog.getWindow().getAttributes().windowAnimations = R.style.animation;
+
+
+    //TODO remove this
+    debugview = findViewById(R.id.debugText);
+
 
     // Listeners
     sonarButton.setOnClickListener(sonarClick);
@@ -81,6 +110,9 @@ public class MainActivity extends AppCompatActivity {
     scopeButton.setOnClickListener(scopeClick);
     rotateButton.setOnClickListener(rotateClick);
     fireButton.setOnClickListener(fireClick);
+    backButton.setOnClickListener(backClick);
+    winButton.setOnClickListener(winClick);
+
 
     //TODO Player Ship Place Map
 
@@ -102,7 +134,6 @@ public class MainActivity extends AppCompatActivity {
     //}
 
     //TODO remove this
-    TextView debugview = findViewById(R.id.debugText);
     ArrayList<int[]> temp =  game.getOpponentPlayer().subLocation;
     String t1 = Arrays.toString(temp.get(0));
     String t2 = Arrays.toString(temp.get(1));
@@ -220,30 +251,18 @@ public class MainActivity extends AppCompatActivity {
     }
   };
 
+
+  // ------------------ CONFIRM CLICK -------------------------------
   View.OnClickListener confirmClick = new View.OnClickListener() {
     @Override
     public void onClick(View view) {
-      //stop touch listener??
-      // Sonar
-      if (offenseChoice.equals("sonar")) {
-        sonarButton.setEnabled(false);
-        game.placeSonar(placerArray, "player");
-      }
-      else if (offenseChoice.equals("scope")) {
-        scopeButton.setEnabled(false);
-        game.placeScope(placerArray, "player");
-      }
-      else if (offenseChoice.equals("fire")) {
-        game.placeFire(placerArray, "player");
-        //update health??
-        opponentHealthText.setText(String.valueOf(game.getOpponentPlayer().health));
-      }
+      //Handle Offensive Placement and Results
+      handlePlacement();
 
-      //TODO Check Player Won??
+      //Check Player Won
       if (game.getOpponentPlayer().health < 1){
-        int test = game.getOpponentPlayer().health;
-        //game over
-        int io = 0;
+        winDialog.show();
+        return;
       }
 
       //Update UI
@@ -253,23 +272,13 @@ public class MainActivity extends AppCompatActivity {
 
       // Change Turns
       if (onSecondTurn){
-        //Update Display
-        disableAllBtns();
-        showOffenseButtons();
-        game.changeTurn();
-        updateTurnDisplay();
-        playerMapView.invalidate();
-        //Clear offenseChoice??
-        onSecondTurn=false;
-        computerTurn();
+        endSecondTurn();
       }else{
         onSecondTurn = true;
         offenseChoice = null;
-        //return with move and sonar disabled
         showOffenseButtons();
       }
       playerMapView.invalidate();
-      // Remove Listener
       playerMapView.setOnTouchListener(null);
     }
   };
@@ -285,6 +294,24 @@ public class MainActivity extends AppCompatActivity {
     }
   };
 
+  View.OnClickListener backClick = new View.OnClickListener() {
+    @Override
+    public void onClick(View view) {
+      showOffenseButtons();
+      //remove placers
+      resetPlacerArray();
+      playerMapView.getMap().removeAllPlacers();
+      playerMapView.setOnTouchListener(null);
+      playerMapView.invalidate();
+    }
+  };
+
+  View.OnClickListener winClick = new View.OnClickListener() {
+    @Override
+    public void onClick(View view) {
+      finish();
+    }
+  };
   //------------------------- ON TOUCH --------------------------------------------------
   private View.OnTouchListener sonarMapTouch = new View.OnTouchListener(){
     @Override
@@ -390,6 +417,34 @@ public class MainActivity extends AppCompatActivity {
     placerArray.clear();
   }
 
+  private void handlePlacement(){
+    if (offenseChoice.equals("sonar")) {
+      sonarButton.setEnabled(false);
+      game.placeSonar(placerArray, "player");
+    }
+    else if (offenseChoice.equals("scope")) {
+      scopeButton.setEnabled(false);
+      game.placeScope(placerArray, "player");
+    }
+    else if (offenseChoice.equals("fire")) {
+      game.placeFire(placerArray, "player");
+      //update health??
+      opponentHealthText.setText(String.valueOf(game.getOpponentPlayer().health));
+    }
+  }
+  private void endSecondTurn(){
+    //Update Display
+    disableAllBtns();
+    showOffenseButtons();
+    game.changeTurn();
+    updateTurnDisplay();
+    playerMapView.invalidate();
+    //Clear offenseChoice??
+    onSecondTurn=false;
+    computerTurn();
+    //Win Check
+    //if (game.getPlayer().health<1){
+  }
   void computerTurn(){
     //game.getOpponentPlayer().getMap()
     //;sleep
@@ -406,9 +461,37 @@ public class MainActivity extends AppCompatActivity {
         game.changeTurn();
 
         updateTurnDisplay();
+
+        //todo debug
+        ArrayList<int[]> subLoc = game.getOpponentPlayer().subLocation;
+        String t1 = Arrays.toString(subLoc.get(0));
+        String t2 = Arrays.toString(subLoc.get(1));
+        String t3 = Arrays.toString(subLoc.get(2));
+        debugview.setText(t1+" "+t2+" "+t3);
       }
     });
     thread.start();
+
+  }
+
+  public void exitMessageSetup(){
+    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+    alertDialogBuilder.setMessage("Are you sure you want to quit?");
+    alertDialogBuilder.setTitle("HideAndSink");
+
+    alertDialogBuilder.setPositiveButton("Yes", (DialogInterface.OnClickListener) (dialog, which) -> {
+      // When the user click yes button then app will close
+      finish();
+    });
+
+
+    // Set the Negative button with No name Lambda OnClickListener method is use of DialogInterface interface.
+    alertDialogBuilder.setNegativeButton("No", (DialogInterface.OnClickListener) (dialog, which) -> {
+      // If user click no then dialog box is canceled.
+      dialog.cancel();
+    });
+    AlertDialog alertDialog = alertDialogBuilder.create();
+    alertDialog.show();
   }
 
 }

@@ -39,13 +39,6 @@ public class MapView extends View {
   boolean placerMode=false;
 
 
-  //Map Touch Listener
-    //interface??
-    //List<BoardTOuchListener> listeners
-  //@Override onTouchEven
-  //@OVerride onDraw(Canvas canvas)
-
-
 /*              DRAW FUNCTION             */
   @Override
   protected void onDraw(Canvas canvas){
@@ -91,8 +84,7 @@ public class MapView extends View {
     d.draw(canvas);
   }
 
-  private void drawShips(Canvas canvas){}
-  private void drawShipHitCell(Canvas canvas){}
+  private void drawSub(Canvas canvas){}
 
   public void drawSquare(Canvas canvas, int color, int x, int y){
     Paint tempPaint = new Paint();
@@ -111,35 +103,28 @@ public class MapView extends View {
     }
     for(int x = 0; x < mapSize; x++){
       for(int y = 0; y < mapSize; y++){
-
-        // Sub Location
-        if(map.cellAt(x, y).getIsSub()) {
-
-        }
-        // Sonar Hit
-        if(map.cellAt(x,y).getIsSonarHit()){
-          drawPNG(canvas, x, y, getResources().getDrawable(R.drawable.radar_red));
-        }
-        // Sonar Miss
-        else if(map.cellAt(x,y).getIsSonarMiss()){
-          //drawShipPlacer(canvas, x, y, getResources().getDrawable(R.drawable.radar, null));
-          drawSquare(canvas, ResourcesCompat.getColor(getResources(), R.color.green, null), x, y);
-        }
-        // Scope Hit
-        if(map.cellAt(x,y).getIsScopeHit()){
-          drawSquare(canvas, ResourcesCompat.getColor(getResources(), R.color.orange, null), x, y);
-        }
-        // Scope Miss
-        else if(map.cellAt(x,y).getIsScopeMiss()){
-          drawSquare(canvas, ResourcesCompat.getColor(getResources(), R.color.yellow, null), x, y);
-        }
-        // Fire Hit
-        if(map.cellAt(x,y).getIsFireHit()){
-          drawSquare(canvas, ResourcesCompat.getColor(getResources(), R.color.red, null), x, y);
-        }
-        // Fire Miss
-        else if(map.cellAt(x,y).getIsFireMiss()){
-          drawSquare(canvas, ResourcesCompat.getColor(getResources(), R.color.blue, null), x, y);
+        String cellLastMove=map.cellAt(x,y).getLastStatus();
+        if (cellLastMove!=null) {
+          switch (cellLastMove) {
+            case "sonarMiss":
+              drawPNG(canvas, x, y, getResources().getDrawable(R.drawable.radar_blue));
+              break;
+            case "sonarHit":
+              drawPNG(canvas, x, y, getResources().getDrawable(R.drawable.radar_red));
+              break;
+            case "scopeMiss":
+              drawPNG(canvas, x, y, getResources().getDrawable(R.drawable.scope_blue));
+              break;
+            case "scopeHit":
+              drawPNG(canvas, x, y, getResources().getDrawable(R.drawable.scope_red));
+              break;
+            case "fireMiss":
+              drawPNG(canvas, x, y, getResources().getDrawable(R.drawable.target_blue));
+              break;
+            case "fireHit":
+              drawPNG(canvas, x, y, getResources().getDrawable(R.drawable.target_red));
+              break;
+          }
         }
         // Placer
         if(map.cellAt(x, y).isPlace){
@@ -149,7 +134,6 @@ public class MapView extends View {
     }
   }
 
-  //locateCell(x,y)
   //public void addBoardTouchListener(BoardTouchListener listener) {
   //public void removeBoardTouchListener(BoardTouchListener listener) {
   //private void notifyBoardTouch(int x, int y) {

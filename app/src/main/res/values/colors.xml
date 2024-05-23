@@ -50,4 +50,8 @@
 
     <!-- Black -->
     <color name="black">#000000</color>
+
+    <!-- Custom -->
+    <color name="water_blue">#00B7C3</color>
+
 </resources>

@@ -13,12 +13,14 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -30,7 +32,8 @@ public class MainActivity extends AppCompatActivity {
   private Player activePlayer, player;
   private ComputerPlayer opponent;
   private MapView playerMapView;
-  private Button fireButton, scopeButton, sonarButton, confirmButton, backButton, moveButton, rotateButton, winButton;
+  private Button confirmButton, backButton, rotateButton, winButton, clearMapButton, toggleSubButton;
+  private ImageButton sonarButton, fireButton, scopeButton, moveButton;
   TextView gameText, playerHealthText, opponentHealthText;
   Dialog winDialog;
 
@@ -74,7 +77,6 @@ public class MainActivity extends AppCompatActivity {
       setSubPlacement(xyList);
     }
 
-
     // Setup Views
     offenseSelectionLayout = findViewById(R.id.gameButtonsLayout);
     confirmSelectionLayout = findViewById(R.id.gameButtonsLayout2);
@@ -83,10 +85,12 @@ public class MainActivity extends AppCompatActivity {
     sonarButton = findViewById(R.id.sonarButton);
     fireButton = findViewById(R.id.fireButton);
     scopeButton = findViewById(R.id.scopeButton);
-    confirmButton = findViewById(R.id.confirmBtn);
-    backButton = findViewById(R.id.backBtn);
-    moveButton = findViewById(R.id.moveBtn);
-    rotateButton = findViewById(R.id.rotateBtn);
+    confirmButton = findViewById(R.id.confirmButton);
+    backButton = findViewById(R.id.backButton);
+    moveButton = findViewById(R.id.moveButton);
+    rotateButton = findViewById(R.id.rotateButton);
+    clearMapButton = findViewById(R.id.clearMapButton);
+    toggleSubButton = findViewById(R.id.toggleSubButton);
     gameText = findViewById(R.id.gameText);
     playerHealthText = findViewById(R.id.playerHealthText);
     opponentHealthText = findViewById(R.id.oppHealthText);
@@ -112,19 +116,19 @@ public class MainActivity extends AppCompatActivity {
     fireButton.setOnClickListener(fireClick);
     backButton.setOnClickListener(backClick);
     winButton.setOnClickListener(winClick);
+    moveButton.setOnClickListener(moveClick);
+    clearMapButton.setOnClickListener(clearMapClick);
 
-
-    //TODO Player Ship Place Map
 
     //Set Boards
     playerMapView.setMap(game.getPlayer().getMap());
 
-    //Displya Player Health
+    //Display Player Health
     playerHealthText.setText(String.valueOf(game.getPlayer().health));
     opponentHealthText.setText(String.valueOf(game.getOpponentPlayer().health));
 
     // Update Display
-    updateTurnDisplay();
+    updateTurnDisplay("Your Turn");
 
     // If Local Multiplayer
     //if (NetworkAdapter.hasConnection()) {
@@ -150,36 +154,21 @@ public class MainActivity extends AppCompatActivity {
     }
   }
   // ----------------- Bottom Display -------------------
-
   public void disableAllBtns(){
-    moveButton.setEnabled(false);
-    sonarButton.setEnabled(false);
-    scopeButton.setEnabled(false);
-    fireButton.setEnabled(false);
+    moveButtonDisable();
+    sonarButtonDisable();
+    scopeButtonDisable();
+    fireButtonDisable();
   }
   public void enableAllBtns(){
-    moveButton.setEnabled(true);
-    sonarButton.setEnabled(true);
-    scopeButton.setEnabled(true);
-    fireButton.setEnabled(true);
-  }
-  public void moveOrFightDisplay() {
-    runOnUiThread(new Runnable() {
-      @Override
-      public void run() {
-        TextView textView = new TextView(ctx);
-        LinearLayout bottomLayout = findViewById(R.id.gameButtonsLayout);
-        //textView.setPadding();
-        Button moveBtn = new Button(ctx);
-        moveBtn.setText("Move");
-        Button fightBtn = new Button(ctx);
-        fightBtn.setText("Fight");
-        textView.setText(R.string.choose_offense);
-        bottomLayout.addView(textView);
-        bottomLayout.addView(fightBtn);
-        bottomLayout.addView(moveBtn);
-      }
-    });
+    moveButton.setClickable(true);
+    moveButton.setBackgroundColor(getResources().getColor(R.color.water_blue));
+    sonarButton.setClickable(true);
+    sonarButton.setBackgroundColor(getResources().getColor(R.color.water_blue));
+    scopeButton.setClickable(true);
+    scopeButton.setBackgroundColor(getResources().getColor(R.color.water_blue));
+    fireButton.setClickable(true);
+    fireButton.setBackgroundColor(getResources().getColor(R.color.water_blue));
   }
   public void showOffenseButtons(){
     offenseSelectionLayout.setVisibility(View.VISIBLE);
@@ -192,34 +181,35 @@ public class MainActivity extends AppCompatActivity {
       public void run() {
         offenseSelectionLayout.setVisibility(View.GONE);
         confirmSelectionLayout.setVisibility(View.VISIBLE);
-        if (offChoice.equals("sonar")){
-          moveButton.setEnabled(false);
-        }
-        if (offChoice.equals("scope")){
-          moveButton.setEnabled(false);
+        if (offChoice.equals("scope") || offChoice.equals("move")){
           rotateButton.setVisibility((View.VISIBLE));
-        }
-        if(offChoice.equals("fire")){
-          moveButton.setEnabled(false);
         }
       }
     });
   }
-  public void updateTurnDisplay() {
+  public void updateTurnDisplay(String dispString) {
     runOnUiThread(new Runnable() {
       @Override
       public void run() {
-        // Opponents Turn
-        if (game.getOpponentPlayer() == game.getActivePlayer()){
-          gameText.setText("Opponents Turn Please Wait");
-        }else{
-          gameText.setText("Your Turn");
-          //TODO change text based on turn 1 or 2.
-          //Remove option if selected, remove move if not selected first.
-          enableAllBtns();
-        }
+        gameText.setText(dispString);
       }
     });
+  }
+  private void moveButtonDisable(){
+    moveButton.setClickable(false);
+    moveButton.setBackgroundColor(Color.GRAY);
+  }
+  private void sonarButtonDisable(){
+    sonarButton.setClickable(false);
+    sonarButton.setBackgroundColor(Color.GRAY);
+  }
+  private void scopeButtonDisable(){
+    scopeButton.setClickable(false);
+    scopeButton.setBackgroundColor(Color.GRAY);
+  }
+  private void fireButtonDisable(){
+    fireButton.setClickable(false);
+    fireButton.setBackgroundColor(Color.GRAY);
   }
 
   // ------------------------- ON CLICK ------------------------------------
@@ -230,6 +220,7 @@ public class MainActivity extends AppCompatActivity {
       playerMapView.setOnTouchListener(sonarMapTouch);
       // Replace Buttons with Back and Confirm
       showConfirmButtons("sonar");
+      updateTurnDisplay("Your Turn: Sonar");
     }
   };
 
@@ -240,6 +231,7 @@ public class MainActivity extends AppCompatActivity {
       playerMapView.setOnTouchListener(scopeMapTouch);
       // Replace Buttons with Back and Confirm
       showConfirmButtons("scope");
+      updateTurnDisplay("Your Turn: Scope");
     }
   };
 
@@ -248,9 +240,18 @@ public class MainActivity extends AppCompatActivity {
     public void onClick(View view) {
       playerMapView.setOnTouchListener(fireMapTouch);
       showConfirmButtons("fire");
+      updateTurnDisplay("Your Turn: Fire");
     }
   };
 
+  View.OnClickListener moveClick = new View.OnClickListener() {
+    @Override
+    public void onClick(View view) {
+      playerMapView.setOnTouchListener(moveMapTouch);
+      showConfirmButtons("move");
+      updateTurnDisplay("Your Turn: Move Sub");
+    }
+  };
 
   // ------------------ CONFIRM CLICK -------------------------------
   View.OnClickListener confirmClick = new View.OnClickListener() {
@@ -271,11 +272,15 @@ public class MainActivity extends AppCompatActivity {
       opponentHealthText.invalidate();
 
       // Change Turns
-      if (onSecondTurn){
+      if (onSecondTurn || offenseChoice.equals("move")){
+        offenseChoice = null;
+        onSecondTurn=false;
         endSecondTurn();
       }else{
         onSecondTurn = true;
         offenseChoice = null;
+        //moveButton.setEnabled(false);
+        moveButtonDisable();
         showOffenseButtons();
       }
       playerMapView.invalidate();
@@ -298,11 +303,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onClick(View view) {
       showOffenseButtons();
-      //remove placers
       resetPlacerArray();
+      rotateButton.setVisibility(View.GONE);
       playerMapView.getMap().removeAllPlacers();
       playerMapView.setOnTouchListener(null);
       playerMapView.invalidate();
+      updateTurnDisplay(getString(R.string.your_turn_choose));
     }
   };
 
@@ -312,6 +318,15 @@ public class MainActivity extends AppCompatActivity {
       finish();
     }
   };
+
+  View.OnClickListener clearMapClick = new View.OnClickListener(){
+    @Override
+    public void onClick(View view) {
+      game.getPlayer().getMap().clearMap();
+      playerMapView.invalidate();
+    }
+  };
+
   //------------------------- ON TOUCH --------------------------------------------------
   private View.OnTouchListener sonarMapTouch = new View.OnTouchListener(){
     @Override
@@ -413,23 +428,76 @@ public class MainActivity extends AppCompatActivity {
     }
   };
 
+  private View.OnTouchListener moveMapTouch = new View.OnTouchListener(){
+  @Override
+  public boolean onTouch(View view, MotionEvent motionEvent) {
+    if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+      //Remove Old Placers
+      game.getPlayer().getMap().removeAllPlacers();
+      if (placerArray.size() > 0)
+        resetPlacerArray();
+      //Translate Touch and Place isPlace squares
+      playerMapView.invalidate();
+      int xy = playerMapView.locatePlace(motionEvent.getX(), motionEvent.getY());
+      int x = xy / 100;
+      int y = xy % 100;
+
+      //handle out of bounds
+      if (dir) {
+        if (y > 5)
+          y = 5;
+
+        // Set Placers
+        game.getPlayer().getMap().cellAt(x, y).isPlace = true;
+        game.getPlayer().getMap().cellAt(x, y+1).isPlace = true;
+        game.getPlayer().getMap().cellAt(x, y+2).isPlace = true;
+
+        //set Placer array for confirmation
+        placerArray.add((x)+","+(y));
+        placerArray.add((x)+","+(y+1));
+        placerArray.add((x)+","+(y+2));
+
+      }else {
+        if (x>5)
+          x=5;
+        // Set Placers
+        game.getPlayer().getMap().cellAt(x, y).isPlace = true;
+        game.getPlayer().getMap().cellAt(x+1, y).isPlace = true;
+        game.getPlayer().getMap().cellAt(x+2, y).isPlace = true;
+
+        //set Placer array for confirmation
+        placerArray.add((x)+","+(y));
+        placerArray.add((x+1)+","+(y));
+        placerArray.add((x+2)+","+(y));
+
+      }
+      return true;
+    }
+    return false;
+  }
+};
+
   public void resetPlacerArray(){
     placerArray.clear();
   }
 
   private void handlePlacement(){
     if (offenseChoice.equals("sonar")) {
-      sonarButton.setEnabled(false);
+      //sonarButton.setEnabled(false);
+      sonarButtonDisable();
       game.placeSonar(placerArray, "player");
     }
     else if (offenseChoice.equals("scope")) {
-      scopeButton.setEnabled(false);
+      //scopeButton.setEnabled(false);
+      scopeButtonDisable();
       game.placeScope(placerArray, "player");
     }
     else if (offenseChoice.equals("fire")) {
       game.placeFire(placerArray, "player");
       //update health??
       opponentHealthText.setText(String.valueOf(game.getOpponentPlayer().health));
+    } else if (offenseChoice.equals("move")) {
+      game.getPlayer().moveSub(placerArray);
     }
   }
   private void endSecondTurn(){
@@ -437,30 +505,29 @@ public class MainActivity extends AppCompatActivity {
     disableAllBtns();
     showOffenseButtons();
     game.changeTurn();
-    updateTurnDisplay();
-    playerMapView.invalidate();
+    updateTurnDisplay("Opponent Turn, Please Wait");
     //Clear offenseChoice??
-    onSecondTurn=false;
     computerTurn();
-    //Win Check
-    //if (game.getPlayer().health<1){
+    //playerMapView.invalidate();
   }
   void computerTurn(){
-    //game.getOpponentPlayer().getMap()
-    //;sleep
-    // Check if play was a move
-
-    //place attack 2
-    //Check if computer won
-    //Change turn
     Thread thread = new Thread(new Runnable() {
       @Override
       public void run() {
         game.computerAttack();
 
+        //check win
+        if (game.getPlayer().health<1){
+          TextView winText = winDialog.findViewById(R.id.winTextview);
+          winText.setText("You Have Lost");
+          winDialog.show();
+        }
+
         game.changeTurn();
 
-        updateTurnDisplay();
+        updateTurnDisplay("Your Turn");
+        // Enable Buttons
+        enableAllBtns();
 
         //todo debug
         ArrayList<int[]> subLoc = game.getOpponentPlayer().subLocation;
@@ -471,9 +538,7 @@ public class MainActivity extends AppCompatActivity {
       }
     });
     thread.start();
-
   }
-
   public void exitMessageSetup(){
     AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
     alertDialogBuilder.setMessage("Are you sure you want to quit?");

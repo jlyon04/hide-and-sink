@@ -5,7 +5,10 @@
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
     </style>
 
-    <style name="Theme.HideAndSink" parent="Base.Theme.HideAndSink" />
+    <style name="Theme.HideAndSink" parent="Base.Theme.HideAndSink" >
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="fontFamily">sans-serif-medium</item>
+    </style>
 
     <style name="animation">
         <item name="android:windowEnterAnimation">@android:anim/fade_in</item>

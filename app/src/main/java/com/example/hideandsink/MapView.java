@@ -21,7 +21,7 @@ public class MapView extends View {
   private Map map;
   private int mapSize = 8;
   private int mapBackgroundColor = Color.parseColor("#00B7C3");
-  private int mapLineColor = Color.WHITE;
+  private int mapLineColor = Color.BLACK;
   private final Paint mapLinePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
   {
     mapLinePaint.setColor(mapLineColor);

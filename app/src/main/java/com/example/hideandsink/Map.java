@@ -65,6 +65,4 @@ public class Map {
     }
   }
 
-  //removeShip
-  //health??
 }

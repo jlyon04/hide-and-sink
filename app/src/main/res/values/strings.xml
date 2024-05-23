@@ -1,6 +1,10 @@
 <resources>
     <string name="app_name">Hide and Sink</string>
 
+    <string name="your_turn_choose">Your Turn: Select an Option</string>
+
+
+
     <string name="new_button_label">New Game</string>
     <string name="title_activity_place_ships">PlaceShipsActivity</string>
     <string name="smart_opponent">Smart Opponent</string>
